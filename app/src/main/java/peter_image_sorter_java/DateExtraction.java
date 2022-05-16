@@ -2,6 +2,7 @@ package peter_image_sorter_java;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
@@ -14,7 +15,7 @@ import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.mp4.Mp4Directory;
 
 public class DateExtraction {
-    public Calendar getFileDateTaken(String fileLocation) throws ImageProcessingException, IOException{
+    public Calendar getFileDateTaken(String fileLocation) throws ImageProcessingException, IOException {
         var fileType = fileLocation.substring(fileLocation.lastIndexOf(".") + 1);
         Metadata fileMetadata = getFileMetadata(fileLocation);
         Calendar toReturn = null;
@@ -34,7 +35,7 @@ public class DateExtraction {
         return toReturn;
     }
 
-    public Metadata getFileMetadata(String fileLocation) throws ImageProcessingException, IOException{
+    public Metadata getFileMetadata(String fileLocation) throws ImageProcessingException, IOException {
         String fileToRead = new File(fileLocation).getAbsolutePath();
         InputStream inputStream = new FileInputStream(fileToRead);
         return ImageMetadataReader.readMetadata(inputStream);
