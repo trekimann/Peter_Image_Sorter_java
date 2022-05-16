@@ -1,0 +1,1 @@
+@start java -jar peterImageSorter.jar %1
