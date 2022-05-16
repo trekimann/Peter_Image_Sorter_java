@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -15,32 +14,19 @@ import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.mp4.Mp4Directory;
 
 public class DateExtraction {
-    public Calendar getFileDateTaken(String fileLocation){
+    public Calendar getFileDateTaken(String fileLocation) throws ImageProcessingException, IOException{
         var fileType = fileLocation.substring(fileLocation.lastIndexOf(".") + 1);
+        Metadata fileMetadata = getFileMetadata(fileLocation);
         Calendar toReturn = null;
         switch (fileType) {
             case "jpg":
             case "heic":
                 // image files, use image date getter
-                try {
-                    toReturn = getDateTakenForImage(fileLocation);
-                } catch (ImageProcessingException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                toReturn = getDateTakenForImage(fileMetadata, toReturn);       
                 break;
             case "mp4":
-                try {
-                    toReturn = getDateTakenForMp4(fileLocation);
-                } catch (ImageProcessingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                // mp4 file, use video data
+                // mp4 file, use video data                
+                toReturn = getDateTakenForMp4(fileMetadata, toReturn);
                 break;
             default:
                 break;
@@ -48,30 +34,26 @@ public class DateExtraction {
         return toReturn;
     }
 
-    public Calendar getDateTakenForImage(String fileLocation) throws ImageProcessingException, IOException{
-        String imageToRead = new File(fileLocation).getAbsolutePath();
-        InputStream inputStream = new FileInputStream(imageToRead);
-        Metadata imageMetaData = ImageMetadataReader.readMetadata(inputStream);
+    public Metadata getFileMetadata(String fileLocation) throws ImageProcessingException, IOException{
+        String fileToRead = new File(fileLocation).getAbsolutePath();
+        InputStream inputStream = new FileInputStream(fileToRead);
+        return ImageMetadataReader.readMetadata(inputStream);
+    }
 
-        var directory = imageMetaData.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+    public Calendar getDateTakenForImage(Metadata fileMetadata, Calendar calendar){
+        var directory = fileMetadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
         
         Date date = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
-        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
 
         // only care about the date, not the time so force that here
         return setToMidnight(calendar);
     }
 
-    public Calendar getDateTakenForMp4(String fileLocation) throws ImageProcessingException, IOException{
-        String videoToRead = new File(fileLocation).getAbsolutePath();
-        InputStream inputStream = new FileInputStream(videoToRead);
-        Metadata imageMetaData = ImageMetadataReader.readMetadata(inputStream);
-
-        var directory = imageMetaData.getFirstDirectoryOfType(Mp4Directory.class);
+    public Calendar getDateTakenForMp4(Metadata fileMetadata, Calendar calendar){
+        var directory = fileMetadata.getFirstDirectoryOfType(Mp4Directory.class);
         
         Date date = directory.getDate(Mp4Directory.TAG_CREATION_TIME);
-        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
 
         // only care about the date, not the time so force that here

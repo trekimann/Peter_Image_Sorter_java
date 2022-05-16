@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Metadata;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -28,18 +29,22 @@ public class DateExtractionTest {
     String dateMp4WasTaken = "29-03-2021";
 
     Calendar expected;
+    Calendar actual;
 
     @BeforeEach
     void setup(){
         dateExtraction = new DateExtraction();
         expected = Calendar.getInstance();
+        actual = Calendar.getInstance();
     }
     
     @Test void whenJpgHasMetadataThenDateShouldBeExtracted() throws ImageProcessingException, IOException, ParseException{
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");   
         expected.setTime(formatter.parse(dateJpgWasTaken));
 
-        var actual = dateExtraction.getDateTakenForImage(test_jpg_location);
+        Metadata testMetadata = dateExtraction.getFileMetadata(test_jpg_location);
+
+        dateExtraction.getDateTakenForImage(testMetadata,actual);
 
         assertEquals(expected, actual);
     }
@@ -48,7 +53,9 @@ public class DateExtractionTest {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");   
         expected.setTime(formatter.parse(dateHeicWasTaken));
 
-        var actual = dateExtraction.getDateTakenForImage(test_heic_location);
+        Metadata testMetadata = dateExtraction.getFileMetadata(test_heic_location);
+
+        dateExtraction.getDateTakenForImage(testMetadata, actual);
 
         assertEquals(expected, actual);
     }
@@ -57,7 +64,9 @@ public class DateExtractionTest {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");   
         expected.setTime(formatter.parse(dateMp4WasTaken));
 
-        var actual = dateExtraction.getDateTakenForMp4(test_mp4_location);
+        Metadata testMetadata = dateExtraction.getFileMetadata(test_mp4_location);
+
+        dateExtraction.getDateTakenForMp4(testMetadata, actual);
 
         assertEquals(expected, actual);
     }
