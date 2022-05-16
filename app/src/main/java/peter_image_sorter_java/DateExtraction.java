@@ -20,7 +20,7 @@ public class DateExtraction {
             case "heic":
                 // image files, use image date getter
                 try {
-                    toReturn = getImageDateTaken(fileLocation);
+                    toReturn = getDateTaken(fileLocation);
                 } catch (ImageProcessingException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -36,7 +36,7 @@ public class DateExtraction {
         return toReturn;
     }
 
-    public Date getImageDateTaken(String fileLocation) throws ImageProcessingException, IOException{
+    public Date getDateTaken(String fileLocation) throws ImageProcessingException, IOException{
         String imageToRead = new File(fileLocation).getAbsolutePath();
         InputStream imageStream = new FileInputStream(imageToRead);
         Metadata imageMetaData = ImageMetadataReader.readMetadata(imageStream);
