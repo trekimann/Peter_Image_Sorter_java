@@ -1,7 +1,12 @@
 package peter_image_sorter_java;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -36,6 +41,45 @@ public class DateExtractionTest {
         dateExtraction = new DateExtraction();
         expected = Calendar.getInstance();
         actual = Calendar.getInstance();
+    }
+
+    @Test void whenFileIsJpgThenImageDateExtractorIsRun() throws ImageProcessingException, IOException{
+        
+        // setup
+        Calendar calendar = Calendar.getInstance();
+        var spyDateExtractor = Mockito.spy(dateExtraction);
+        Mockito.doReturn(calendar).when(spyDateExtractor).getDateTakenForImage(Mockito.any(), Mockito.any());
+
+        spyDateExtractor.getFileDateTaken(test_jpg_location);
+
+        verify(spyDateExtractor, times(1)).getDateTakenForImage(Mockito.any(), Mockito.any());
+
+    }
+
+    @Test void whenFileIsHeicThenImageDateExtractorIsRun() throws ImageProcessingException, IOException{
+        
+        // setup
+        Calendar calendar = Calendar.getInstance();
+        var spyDateExtractor = Mockito.spy(dateExtraction);
+        Mockito.doReturn(calendar).when(spyDateExtractor).getDateTakenForImage(Mockito.any(), Mockito.any());
+
+        spyDateExtractor.getFileDateTaken(test_heic_location);
+
+        verify(spyDateExtractor, times(1)).getDateTakenForImage(Mockito.any(), Mockito.any());
+
+    }
+
+    @Test void whenFileIsMp4ThenMp4DateExtractorIsRun() throws ImageProcessingException, IOException{
+        
+        // setup
+        Calendar calendar = Calendar.getInstance();
+        var spyDateExtractor = Mockito.spy(dateExtraction);
+        Mockito.doReturn(calendar).when(spyDateExtractor).getDateTakenForMp4(Mockito.any(), Mockito.any());
+
+        spyDateExtractor.getFileDateTaken(test_mp4_location);
+
+        verify(spyDateExtractor, times(1)).getDateTakenForMp4(Mockito.any(), Mockito.any());
+
     }
     
     @Test void whenJpgHasMetadataThenDateShouldBeExtracted() throws ImageProcessingException, IOException, ParseException{
